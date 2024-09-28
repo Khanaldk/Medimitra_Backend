@@ -10,16 +10,18 @@ namespace MediMitra.Services
 {
     public class BookingVaccinationServices
     {
-        private readonly Queue<int> _bookingQueue;
+        //private readonly Queue<int> _bookingQueue;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
-        private const int MaxCapacity = 0; // or whatever default value you want
+        private const int MaxCapacity = 500;
+        private readonly BookingQueueService _queueService;
 
-        public BookingVaccinationServices(ApplicationDbContext context, IConfiguration configuration)
+        public BookingVaccinationServices(ApplicationDbContext context, IConfiguration configuration, BookingQueueService queueService)
         {
-            _bookingQueue = new Queue<int>(MaxCapacity);
+            //_bookingQueue = new Queue<int>(MaxCapacity);
             _context = context;
             _configuration = configuration;
+            _queueService = queueService;
         }
 
         // Enqueue a new booking
@@ -44,24 +46,28 @@ namespace MediMitra.Services
                 Token= token,
                 UserId= userId
             };
-
+            //var vaccinationBookpart = await _context.bookingVaccinations.FirstOrDefaultAsync(v => v.VaccinationId == bookVaccination.VaccinationId);
+            //if(vaccinationBookpart != null)
+            //{
+            //    return new Response<BookingVaccination> { Status = false, Message = "Vaccination is aleady booked by you!" };
+            //}
             var vaccinationpart=await _context.vaccinations.FirstOrDefaultAsync(v=>v.VaccinationId==booking.VaccinationId);
 
             if (vaccinationpart==null) 
             {
                 return new Response<BookingVaccination> { Status = false, Message = "VaccinationId not Found!" };
             }
-            // Add to the queue
-            _bookingQueue.Enqueue(bookVaccination.BookingId);
-            Console.WriteLine($"Booking ID {bookVaccination.BookingId} enqueued successfully. Current Queue Size: {_bookingQueue.Count}");
-            
 
-            // Save to database
+           
             await _context.bookingVaccinations.AddAsync(bookVaccination);
             await _context.SaveChangesAsync();
 
+          
+            _queueService.EnqueueQueue(bookVaccination.BookingId);
+          
+            Console.WriteLine($"Booking ID {bookVaccination.BookingId} enqueued successfully. Current Queue Size: {_queueService.GetTotalQueueSize()}");
 
-            //logic for sending email 
+           
             //try
             //{
             //    var message = new MimeMessage();
@@ -91,19 +97,23 @@ namespace MediMitra.Services
 
             return new Response<BookingVaccination> { Status = true, Message = $"Vaccination Booked and Token sent successfully!", Data = bookVaccination };
         }
+
         private string GenerateToken(int bookingId)
         {
             return bookingId.ToString("D4"); 
         }
-        // Check if the queue is full
+       
         private bool IsQueueFull()
         {
-            return _bookingQueue.Count >= MaxCapacity;
+            int value=_queueService.GetTotalQueueSize();
+            return value == MaxCapacity;
         }
-        // Check if the queue is empty
+     
         private bool IsQueueEmpty()
         {
-            return _bookingQueue.Count == 0;
+
+            int value = _queueService.GetTotalQueueSize();
+            return value == 0;
         }
     }
 

@@ -17,9 +17,9 @@ namespace MediMitra.Controllers
     public class BookingVaccinationController : ControllerBase
     {
         private readonly BookingVaccinationServices _bookingVaccinationServices;
-        public BookingVaccinationController(ApplicationDbContext dbContext, IConfiguration configuration)
+        public BookingVaccinationController(ApplicationDbContext dbContext, IConfiguration configuration, BookingVaccinationServices bookingVaccinationServices)
         {
-            _bookingVaccinationServices = new BookingVaccinationServices(dbContext,configuration);
+            _bookingVaccinationServices = bookingVaccinationServices;
         }
 
       

@@ -101,7 +101,7 @@ namespace MediMitra.Migrations
                             Id = 1,
                             Email = "khanalvaidurga71@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$LpGJHMEOQHKbwDLtD/S6se8GsrVByYtim6RTao7r4OPnRk3gt0XWG",
+                            Password = "$2a$11$tJQSXMDNhszX6KX4qo194.OoZre8h0FTLwB5Dl2o.UAElzl6Q./JK",
                             Role = "Admin",
                             Username = "Durga Khanal"
                         },
@@ -110,7 +110,7 @@ namespace MediMitra.Migrations
                             Id = 2,
                             Email = "sumildumre555@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$eL6CZwg.QuOqbQTokOMGne0Fy.3PLoqgTXhOl/9avzBNRhTwnMETC",
+                            Password = "$2a$11$zwPeaPk.xZSOys17Aw3OPOBR2DBVj75qfa32UZmM/urqF1jHbpM1C",
                             Role = "Moderator",
                             Username = "Sunil Dumre"
                         },
@@ -119,7 +119,7 @@ namespace MediMitra.Migrations
                             Id = 3,
                             Email = "bhushaltilak9@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$uMk7DwzX64SxWVbvkoYid.181g8xRntfZPZDbXmAdGu7/NEkaZs2y",
+                            Password = "$2a$11$CKeCEzH/OXBjq7wT9EiryuBwnwShZPbk4yDISOGibnUS7Hvap8dqy",
                             Role = "Moderator",
                             Username = "Tilak Bhusal"
                         });

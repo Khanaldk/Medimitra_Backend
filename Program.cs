@@ -46,6 +46,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IVaccinationServices, VaccinationServices>();
+builder.Services.AddSingleton<BookingQueueService>();
 builder.Services.AddScoped<BookingVaccinationServices>();
 
 //builder.Services.AddScoped<BookingVaccinationServices>(sp =>

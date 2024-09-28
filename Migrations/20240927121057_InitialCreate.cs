@@ -74,9 +74,9 @@ namespace MediMitra.Migrations
                 columns: new[] { "Id", "Email", "Otp", "Password", "Role", "Username" },
                 values: new object[,]
                 {
-                    { 1, "khanalvaidurga71@gmail.com", 0, "$2a$11$LpGJHMEOQHKbwDLtD/S6se8GsrVByYtim6RTao7r4OPnRk3gt0XWG", "Admin", "Durga Khanal" },
-                    { 2, "sumildumre555@gmail.com", 0, "$2a$11$eL6CZwg.QuOqbQTokOMGne0Fy.3PLoqgTXhOl/9avzBNRhTwnMETC", "Moderator", "Sunil Dumre" },
-                    { 3, "bhushaltilak9@gmail.com", 0, "$2a$11$uMk7DwzX64SxWVbvkoYid.181g8xRntfZPZDbXmAdGu7/NEkaZs2y", "Moderator", "Tilak Bhusal" }
+                    { 1, "khanalvaidurga71@gmail.com", 0, "$2a$11$tJQSXMDNhszX6KX4qo194.OoZre8h0FTLwB5Dl2o.UAElzl6Q./JK", "Admin", "Durga Khanal" },
+                    { 2, "sumildumre555@gmail.com", 0, "$2a$11$zwPeaPk.xZSOys17Aw3OPOBR2DBVj75qfa32UZmM/urqF1jHbpM1C", "Moderator", "Sunil Dumre" },
+                    { 3, "bhushaltilak9@gmail.com", 0, "$2a$11$CKeCEzH/OXBjq7wT9EiryuBwnwShZPbk4yDISOGibnUS7Hvap8dqy", "Moderator", "Tilak Bhusal" }
                 });
         }
 
