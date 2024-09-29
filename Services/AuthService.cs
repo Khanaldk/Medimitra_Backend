@@ -85,22 +85,17 @@ namespace MediMitra.Services
             return new Response<string> { Status = false, Message = "Email or password doesnot match.", Type = "EmailPassword" };
         }
 
-        public async Task<Response<string>> changePassword(ChangePasswordDTO changePasswordDTO)
+        public async Task<Response<string>> changePassword(ChangePasswordDTO changePasswordDTO, String Email)
         {
-            var user = await _context.registerModels.FirstOrDefaultAsync(u => u.Email == changePasswordDTO.Email);
-            if (user == null)
-            {
-                return new Response<string> { Status = false, Message = "Email doesnot exist!" };
-            }
-          
-            if (BCrypt.Net.BCrypt.Verify(changePasswordDTO.OldPassword, user.Password) && user.Email == changePasswordDTO.Email)
+            var user = await _context.registerModels.FirstOrDefaultAsync(u => u.Email == Email);
+            if (user!=null && BCrypt.Net.BCrypt.Verify(changePasswordDTO.OldPassword, user.Password) && user.Email ==Email)
             {
                 user.Password = BCrypt.Net.BCrypt.HashPassword(changePasswordDTO.NewPassword);
                 _context.Update(user);
                 await _context.SaveChangesAsync();
                 return new Response<string> { Status = true, Message = "Password changed successfully!"};
             }
-            return new Response<string> { Status = false, Message = "Email or password doesnot match!" };
+            return new Response<string> { Status = false, Message = "Old password doesnot match!",Type="OldPassword" };
 
         }
 
@@ -110,12 +105,10 @@ namespace MediMitra.Services
             var user = await _context.registerModels.FirstOrDefaultAsync(u => u.Email == email);
             if (user != null)
             {
-            
-                //generate otp
+               
                 Random random = new Random();
                 int otp = random.Next(10000, 100000);
-
-                //logic for sending email 
+             
                 try
                 {
                     var message = new MimeMessage();
@@ -130,7 +123,7 @@ namespace MediMitra.Services
                         await client.AuthenticateAsync(_configuration["SmtpSettings:Username"], _configuration["SmtpSettings:Password"]);
                         await client.SendAsync(message);
                         user.Otp = otp;
-                       await _context.SaveChangesAsync();
+                        await _context.SaveChangesAsync();
                         await client.DisconnectAsync(true);
                      
                         return new Response<int> { Status = true, Message = "Otp Sent Successfully!" };

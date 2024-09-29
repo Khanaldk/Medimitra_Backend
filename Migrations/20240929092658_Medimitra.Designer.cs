@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MediMitra.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240927121057_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240929092658_Medimitra")]
+    partial class Medimitra
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,11 +37,11 @@ namespace MediMitra.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("BookingDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("BookingDate")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime>("DOB")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("DOB")
+                        .HasColumnType("date");
 
                     b.Property<string>("PatientName")
                         .IsRequired()
@@ -104,7 +104,7 @@ namespace MediMitra.Migrations
                             Id = 1,
                             Email = "khanalvaidurga71@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$tJQSXMDNhszX6KX4qo194.OoZre8h0FTLwB5Dl2o.UAElzl6Q./JK",
+                            Password = "$2a$11$FSzUlziklXrrzCKsUqYdA.SCzuUlWagk1yjU1uBR98putt94k5FyG",
                             Role = "Admin",
                             Username = "Durga Khanal"
                         },
@@ -113,7 +113,7 @@ namespace MediMitra.Migrations
                             Id = 2,
                             Email = "sumildumre555@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$zwPeaPk.xZSOys17Aw3OPOBR2DBVj75qfa32UZmM/urqF1jHbpM1C",
+                            Password = "$2a$11$SyGE50/xOdA7bAYEc0fVp.00LqedRH3orjDNFg.krdRXTcE46jBWu",
                             Role = "Moderator",
                             Username = "Sunil Dumre"
                         },
@@ -122,7 +122,7 @@ namespace MediMitra.Migrations
                             Id = 3,
                             Email = "bhushaltilak9@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$CKeCEzH/OXBjq7wT9EiryuBwnwShZPbk4yDISOGibnUS7Hvap8dqy",
+                            Password = "$2a$11$/mYxoFxsf07oZGCYh7XKa.Hia7FZZovGXywz7QsDL12jXXubS7a3K",
                             Role = "Moderator",
                             Username = "Tilak Bhusal"
                         });
@@ -140,15 +140,16 @@ namespace MediMitra.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("ServeDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("VaccinationDose")
                         .HasColumnType("int");

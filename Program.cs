@@ -49,14 +49,6 @@ builder.Services.AddScoped<IVaccinationServices, VaccinationServices>();
 builder.Services.AddSingleton<BookingQueueService>();
 builder.Services.AddScoped<BookingVaccinationServices>();
 
-//builder.Services.AddScoped<BookingVaccinationServices>(sp =>
-//{
-//    var dbContext = sp.GetRequiredService<ApplicationDbContext>();
-//    int capacity = 100; // Replace with your desired capacity or retrieve from configuration
-//    var configuration = sp.GetRequiredService<IConfiguration>();
-//    return new BookingVaccinationServices(dbContext, capacity, configuration);
-//});
-
 
 // Adding Authentication
 builder.Services.AddAuthentication(options =>
@@ -81,29 +73,59 @@ builder.Services.AddAuthentication(options =>
     {
         OnAuthenticationFailed = context =>
         {
-            context.Response.StatusCode = 401;
-            context.Response.ContentType = "application/json";
-            var result = JsonSerializer.Serialize(new { message = "Unauthorized access. Invalid token." });
-            return context.Response.WriteAsync(result);
+            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+                var ErrorResult = new
+                {
+                    message = "Token expired",
+                    errorCode = "AUTH_TOKEN_EXPIRED",
+                    timestamp = DateTime.UtcNow,
+                    details = "Your session has expired. Please obtain a new token and try again.",
+                };
+                var result = JsonSerializer.Serialize(ErrorResult);
+                return context.Response.WriteAsync(result);
+            }
+            return Task.CompletedTask;
         },
         OnChallenge = context =>
         {
             if (!context.Response.HasStarted)
             {
-                context.Response.StatusCode = 401; // Unauthorized
+                context.Response.StatusCode = 401;
                 context.Response.ContentType = "application/json";
-                var result = new { message = "Token not found or you are not permitted to use this resource" };
+                var resultError = new
+                {
+                    message = "Token not found or you are not permitted to use this resource",
+                    errorCode = "AUTH_TOKEN_NOT_FOUND",
+                    timestamp = DateTime.UtcNow,
+                    details = "The token is either missing or invalid. Please make sure you have the correct permissions."
+                };
+
+                var result = JsonSerializer.Serialize(resultError);
                 return context.Response.WriteAsJsonAsync(result);
             }
-            // If the response has already started, complete the task without attempting further actions
+        
+            context.HandleResponse();
             return Task.CompletedTask;
         },
         OnForbidden = context =>
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             context.Response.ContentType = "application/json";
-            var result = JsonSerializer.Serialize(new { message = "You do not have permission to access this resource." });
-            return context.Response.WriteAsync(result);
+
+            var result = new
+            {
+                message = "You are not permitted to access this resource",
+                errorCode = "AUTH_FORBIDDEN",
+                timestamp = DateTime.UtcNow,
+                details = "Your current permissions do not allow access to this resource. Contact your administrator for more information."
+            };
+
+            var jsonResponse = JsonSerializer.Serialize(result);
+            return context.Response.WriteAsync(jsonResponse);
+
         }
     };
 });
@@ -121,9 +143,6 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API documentation with JWT authentication"
     });
-
-    // Show enum values as strings in Swagger (optional)
-    c.UseInlineDefinitionsForEnums();
 
     // Add JWT Authentication in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -159,8 +178,8 @@ builder.Services.AddSwaggerGen(c =>
 //Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),sqlOptions => {
-    sqlOptions.CommandTimeout(60); // Command Timeout in seconds
-    sqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null); // Retry logic
+    sqlOptions.CommandTimeout(60);
+    sqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(5), null);
 })
 );
 
@@ -172,6 +191,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseExceptionHandler("/Home/Error");
 }
 
 app.UseCors("AllowReactApp");

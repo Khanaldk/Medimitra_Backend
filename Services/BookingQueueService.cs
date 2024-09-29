@@ -1,12 +1,12 @@
-﻿using System.Collections.Concurrent;
+﻿using MediMitra.Models;
+using System.Collections.Concurrent;
 
 namespace MediMitra.Services
 {
     public class BookingQueueService
     {
 
-        private readonly ConcurrentQueue<int> _bookingQueue = new ConcurrentQueue<int>();
-
+        private readonly ConcurrentQueue<int> _bookingQueue=new ConcurrentQueue<int>();
         public void EnqueueQueue(int bookingId)
         {
             _bookingQueue.Enqueue(bookingId);
@@ -16,5 +16,28 @@ namespace MediMitra.Services
         {
             return _bookingQueue.Count;
         }
+        public int? GetNextBooking()
+        {
+            if (_bookingQueue.TryPeek(out int nextBookingId))
+            {
+                return nextBookingId;
+            }
+            return null; 
+        }
+
+        public int? GetNextBookingForDelayed()
+        {
+            if (_bookingQueue.TryPeek(out int nextBookingId))
+            {
+            
+                if (_bookingQueue.TryDequeue(out int nextDequeueBookingId))
+                {
+                    return nextDequeueBookingId;
+                }
+            }
+      
+            return nextBookingId; 
+        }
+
     }
 }

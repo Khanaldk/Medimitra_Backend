@@ -17,6 +17,7 @@ namespace MediMitra.Controllers
             {
                 _vaccinationServices = vaccinationServices;
         }
+
         [Authorize(Roles ="Admin,Moderator")]
         [HttpPost]
         [Route("add")]
@@ -33,15 +34,11 @@ namespace MediMitra.Controllers
             }
             return BadRequest(ModelState);
         }
-        [Authorize(Roles = "Admin,Moderator")]
+    
         [HttpGet]
         [Route("getAll")]
         public async Task<IActionResult> GetAllVaccination()
         {
-            //var userName = User.FindFirstValue(ClaimTypes.Name);
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //Console.WriteLine($"UserId:{userId}");
-            //Console.WriteLine($"userName:{userName}");
             var result=await _vaccinationServices.getallVaccination();
             if (result.Status)
             {

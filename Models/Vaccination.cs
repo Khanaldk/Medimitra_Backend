@@ -11,9 +11,13 @@ namespace MediMitra.Models
         public String Location { get; set; } = string.Empty;
         public int VaccinationDose { get; set; } 
         public String AgeGroup { get; set; } = string.Empty;
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateOnly ServeDate { get; set; }
+        public VaccinationStatus Status { get; set; }
 
-
+    }
+    public enum VaccinationStatus
+    {
+        Running,
+        Completed
     }
 }

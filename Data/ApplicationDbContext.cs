@@ -20,7 +20,13 @@ namespace MediMitra.Data
             modelBuilder.Entity<BookingVaccination>()
         .Property(b => b.Status)
         .HasConversion<string>();
+
+            modelBuilder.Entity<Vaccination>()
+     .Property(b => b.Status)
+     .HasConversion<string>();
+
             SeedUser(modelBuilder);
+         
 
         }
         private static void SeedUser(ModelBuilder modelBuilder)

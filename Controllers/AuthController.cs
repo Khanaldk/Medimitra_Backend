@@ -1,10 +1,12 @@
 ﻿using MediMitra.Data;
 using MediMitra.DTO;
 using MediMitra.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MediMitra.Controllers
 {
@@ -49,13 +51,15 @@ namespace MediMitra.Controllers
              return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
+        [Authorize]
         [HttpPut]
         [Route("change-password")]
         public async Task<IActionResult> updatePassword(ChangePasswordDTO changePasswordDTO)
         {
             if(ModelState.IsValid)
             {
-            var result = await _authService.changePassword(changePasswordDTO);
+                var Email = User.FindFirstValue(ClaimTypes.Email);
+                var result = await _authService.changePassword(changePasswordDTO,Email);
                 if (result.Status)
                 {
                     return StatusCode(StatusCodes.Status200OK, result);

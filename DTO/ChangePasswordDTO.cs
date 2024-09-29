@@ -4,9 +4,6 @@ namespace MediMitra.DTO
 {
     public class ChangePasswordDTO
     {
-        [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid Email Address.")]
-        public string Email { get; set; } = String.Empty;
         public string OldPassword { get; set; } = String.Empty;
 
         [Required(ErrorMessage = "Password is required.")]

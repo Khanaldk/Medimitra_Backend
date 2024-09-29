@@ -31,17 +31,87 @@ namespace MediMitra.Controllers
             {
                 return BadRequest("Invalid booking data.");
             }
-            String userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            String Email = User.FindFirstValue(ClaimTypes.Email);
-            var addedBooking = await _bookingVaccinationServices.CreateVaccinationBooking(booking,userId,Email);
-            if (addedBooking.Status)
+           if(ModelState.IsValid)
             {
-                return StatusCode(StatusCodes.Status201Created, addedBooking);
+                String userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                String Email = User.FindFirstValue(ClaimTypes.Email);
+                var addedBooking = await _bookingVaccinationServices.CreateVaccinationBooking(booking, userId, Email);
+                if (addedBooking.Status)
+                {
+                    return StatusCode(StatusCodes.Status201Created, addedBooking);
+                }
+                return StatusCode(StatusCodes.Status400BadRequest, addedBooking);
             }
-            return StatusCode(StatusCodes.Status400BadRequest, addedBooking);
+            return BadRequest(ModelState);
         }
 
+        [Authorize(Roles = "Admin,Moderator")]
+        [HttpGet("peeknextBooking")]
+        public async Task<IActionResult> PeekNextBookingvaccination()
+        {
+            // Retrieve the next booking ID from the queue
+            var nextBookingId =await _bookingVaccinationServices.PeekNextBooking();
+            if (nextBookingId.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, nextBookingId);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, nextBookingId);
 
+        }
+
+        [Authorize(Roles = "Admin,Moderator")]
+        [HttpPut("markedStatusAsDelayed")]
+        public async Task<IActionResult> DelayedBookingvaccination()
+        {
+            // Retrieve the next booking ID from the queue
+            var nextBookingId = await _bookingVaccinationServices.MarkDelayedNextBooking();
+            if (nextBookingId.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, nextBookingId);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, nextBookingId);
+
+        }
+
+        [Authorize(Roles = "Admin,Moderator")]
+        [HttpPut("markedStatusAsServed")]
+        public async Task<IActionResult> ServedBookingvaccination()
+        {
+            // Retrieve the next booking ID from the queue
+            var nextBookingId = await _bookingVaccinationServices.MarkServedNextBooking();
+            if (nextBookingId.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, nextBookingId);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, nextBookingId);
+
+        }
+
+        [Authorize(Roles = "Admin,Moderator")]
+        [HttpGet("retrieveVaccinationBookDelayed")]
+        public async Task<IActionResult> GetDelayedBookingvaccination()
+        {
+            // Retrieve the next booking ID from the queue
+            var nextBookingId = await _bookingVaccinationServices.GetDelayedBookingsSortedAsync();
+            if (nextBookingId!=null)
+            {
+                return StatusCode(StatusCodes.Status200OK, nextBookingId);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, nextBookingId);
+
+        }
+
+        [Authorize(Roles = "Admin,Moderator")]
+        [HttpPut("DelayedToServe/{id}")]
+        public async Task<IActionResult> ChangeDelayedStatusToServed(int id)
+        {
+            var result=await _bookingVaccinationServices.UpdateDelayedStatusToServed(id);
+            if (result.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, result);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
     }
 }
 

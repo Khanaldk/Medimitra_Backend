@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MediMitra.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Medimitra : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,9 +21,9 @@ namespace MediMitra.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PatientName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DOB = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DOB = table.Column<DateOnly>(type: "date", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BookingDate = table.Column<DateOnly>(type: "date", nullable: false),
                     VaccinationId = table.Column<int>(type: "int", nullable: false),
                     Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -61,8 +61,8 @@ namespace MediMitra.Migrations
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VaccinationDose = table.Column<int>(type: "int", nullable: false),
                     AgeGroup = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ServeDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,9 +74,9 @@ namespace MediMitra.Migrations
                 columns: new[] { "Id", "Email", "Otp", "Password", "Role", "Username" },
                 values: new object[,]
                 {
-                    { 1, "khanalvaidurga71@gmail.com", 0, "$2a$11$tJQSXMDNhszX6KX4qo194.OoZre8h0FTLwB5Dl2o.UAElzl6Q./JK", "Admin", "Durga Khanal" },
-                    { 2, "sumildumre555@gmail.com", 0, "$2a$11$zwPeaPk.xZSOys17Aw3OPOBR2DBVj75qfa32UZmM/urqF1jHbpM1C", "Moderator", "Sunil Dumre" },
-                    { 3, "bhushaltilak9@gmail.com", 0, "$2a$11$CKeCEzH/OXBjq7wT9EiryuBwnwShZPbk4yDISOGibnUS7Hvap8dqy", "Moderator", "Tilak Bhusal" }
+                    { 1, "khanalvaidurga71@gmail.com", 0, "$2a$11$FSzUlziklXrrzCKsUqYdA.SCzuUlWagk1yjU1uBR98putt94k5FyG", "Admin", "Durga Khanal" },
+                    { 2, "sumildumre555@gmail.com", 0, "$2a$11$SyGE50/xOdA7bAYEc0fVp.00LqedRH3orjDNFg.krdRXTcE46jBWu", "Moderator", "Sunil Dumre" },
+                    { 3, "bhushaltilak9@gmail.com", 0, "$2a$11$/mYxoFxsf07oZGCYh7XKa.Hia7FZZovGXywz7QsDL12jXXubS7a3K", "Moderator", "Tilak Bhusal" }
                 });
         }
 

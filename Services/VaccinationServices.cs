@@ -27,8 +27,8 @@ namespace MediMitra.Services
                 Location = addvaccinationDTO.Location,  
                 VaccinationDose = addvaccinationDTO.VaccinationDose,
                 AgeGroup = addvaccinationDTO.AgeGroup,
-                StartDate = addvaccinationDTO.StartDate,
-                EndDate = addvaccinationDTO.EndDate
+                ServeDate = addvaccinationDTO.ServeDate,
+                Status=Models.VaccinationStatus.Running
             };
 
             if(vaccination!=null)
@@ -39,8 +39,6 @@ namespace MediMitra.Services
                    
                     for (int i = 0;i<user.Count;i++)
                     {
-                        //Console.Write($"user:{user[i].Email}");
-                        //logic for sending email 
                         try
                         {
                             var message = new MimeMessage();
@@ -57,8 +55,7 @@ namespace MediMitra.Services
                                 - स्थान:{vaccination.Location}
                                 - खोपको मात्रा: {vaccination.VaccinationDose}
                                 - उमेर समूह: {vaccination.AgeGroup}
-                                - सुरु मिति: {vaccination.StartDate:yyyy-MM-dd}
-                                - अन्त्य मिति: {vaccination.EndDate:yyyy-MM-dd}
+                                - Service मिति: {vaccination.ServeDate:yyyy-MM-dd}
 
                                 कृपया विवरणहरू समीक्षा गर्नुहोस् र आवश्यक कार्यहरू गर्नुहोस्।
                                 "
@@ -96,7 +93,7 @@ namespace MediMitra.Services
             var vaccinationrecords=await _context.vaccinations.ToListAsync();
             if(vaccinationrecords==null || vaccinationrecords.Count == 0)
             {
-                return new Response<List<Vaccination>> { Status = false, Message = "No vaccination Records found." };
+                return new Response<List<Vaccination>> { Status = false, Message = "No vaccination Records found.",Type="NoVaccinationData" };
             }
             return new Response<List<Vaccination>> { Status = true, Message = "vaccination Records retrieved successfully!.",Data=vaccinationrecords };
 
@@ -107,7 +104,7 @@ namespace MediMitra.Services
             var vaccination=await _context.vaccinations.FirstOrDefaultAsync(v=>v.VaccinationId==id);
             if (vaccination == null)
             {
-                return new Response<Vaccination> { Status = false, Message = "Vaccination not found!" };
+                return new Response<Vaccination> { Status = false, Message = "Vaccination not found!",Type="VaccinationIdNotFound" };
             }
             return new Response<Vaccination> { Status = true, Message = "Vaccination retrieved!",Data=vaccination };
 
@@ -117,7 +114,7 @@ namespace MediMitra.Services
             var vaccination = await _context.vaccinations.FirstOrDefaultAsync(v => v.VaccinationName == vaccinationName);
             if (vaccination == null)
             {
-                return new Response<Vaccination> { Status = false, Message = "Vaccination not found!" };
+                return new Response<Vaccination> { Status = false, Message = "Vaccinationname not found!",Type="VaccinatioNameNotFound" };
             }
             return new Response<Vaccination> { Status = true, Message = "Vaccination retrieved successfully!", Data = vaccination };
 
@@ -127,7 +124,7 @@ namespace MediMitra.Services
             var vaccination = await _context.vaccinations.FirstOrDefaultAsync(v => v.VaccinationType == vaccinationType);
             if (vaccination == null)
             {
-                return new Response<Vaccination> { Status = false, Message = "Vaccination not found!" };
+                return new Response<Vaccination> { Status = false, Message = "VaccinationType not found!",Type="NoVaccinationType" };
             }
             return new Response<Vaccination> { Status = true, Message = "Vaccination retrieved successfully!", Data = vaccination };
 
@@ -138,7 +135,7 @@ namespace MediMitra.Services
             var vaccination = await _context.vaccinations.FirstOrDefaultAsync(v =>v.VaccinationName==vaccinationName && v.VaccinationType == vaccinationType);
             if (vaccination == null)
             {
-                return new Response<Vaccination> { Status = false, Message = "Vaccination not found!" };
+                return new Response<Vaccination> { Status = false, Message = "VaccinationName along with VaccinationType not found!" ,Type="VaccinationNameAndTypeNotFound"};
             }
             return new Response<Vaccination> { Status = true, Message = "Vaccination retrieved successfully!", Data = vaccination };
 
@@ -155,17 +152,14 @@ namespace MediMitra.Services
             vaccination.VaccinationType = updateVaccinationDTO.VaccinationType;
             vaccination.VaccinationDose = updateVaccinationDTO.VaccinationDose;
             vaccination.AgeGroup= updateVaccinationDTO.AgeGroup;
-            vaccination.StartDate= updateVaccinationDTO.StartDate;
-            vaccination.EndDate= updateVaccinationDTO.EndDate;
-
+            vaccination.ServeDate= updateVaccinationDTO.ServeDate;
+          
             var user = await _context.registerModels.ToListAsync();
             if (user != null)
             {
 
                 for (int i = 0; i < user.Count; i++)
                 {
-                    //Console.Write($"user:{user[i].Email}");
-                    //logic for sending email 
                     try
                     {
                         var message = new MimeMessage();
@@ -181,8 +175,7 @@ namespace MediMitra.Services
                                 - खोपको प्रकार: {vaccination.VaccinationType}
                                 - खोपको मात्रा: {vaccination.VaccinationDose}
                                 - उमेर समूह: {vaccination.AgeGroup}
-                                - सुरु मिति: {vaccination.StartDate:yyyy-MM-dd}
-                                - अन्त्य मिति: {vaccination.EndDate:yyyy-MM-dd}
+                                - Service मिति: {vaccination.ServeDate:yyyy-MM-dd}
 
                                 कृपया विवरणहरू समीक्षा गर्नुहोस् र आवश्यक कार्यहरू गर्नुहोस्।
                                 "
