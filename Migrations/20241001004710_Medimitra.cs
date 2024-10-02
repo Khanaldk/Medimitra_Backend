@@ -14,26 +14,6 @@ namespace MediMitra.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "bookingVaccinations",
-                columns: table => new
-                {
-                    BookingId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PatientName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DOB = table.Column<DateOnly>(type: "date", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookingDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    VaccinationId = table.Column<int>(type: "int", nullable: false),
-                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_bookingVaccinations", x => x.BookingId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "registerModels",
                 columns: table => new
                 {
@@ -69,15 +49,46 @@ namespace MediMitra.Migrations
                     table.PrimaryKey("PK_vaccinations", x => x.VaccinationId);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "bookingVaccinations",
+                columns: table => new
+                {
+                    BookingId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PatientName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DOB = table.Column<DateOnly>(type: "date", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BookingDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    VaccinationId = table.Column<int>(type: "int", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_bookingVaccinations", x => x.BookingId);
+                    table.ForeignKey(
+                        name: "FK_bookingVaccinations_vaccinations_VaccinationId",
+                        column: x => x.VaccinationId,
+                        principalTable: "vaccinations",
+                        principalColumn: "VaccinationId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "registerModels",
                 columns: new[] { "Id", "Email", "Otp", "Password", "Role", "Username" },
                 values: new object[,]
                 {
-                    { 1, "khanalvaidurga71@gmail.com", 0, "$2a$11$FSzUlziklXrrzCKsUqYdA.SCzuUlWagk1yjU1uBR98putt94k5FyG", "Admin", "Durga Khanal" },
-                    { 2, "sumildumre555@gmail.com", 0, "$2a$11$SyGE50/xOdA7bAYEc0fVp.00LqedRH3orjDNFg.krdRXTcE46jBWu", "Moderator", "Sunil Dumre" },
-                    { 3, "bhushaltilak9@gmail.com", 0, "$2a$11$/mYxoFxsf07oZGCYh7XKa.Hia7FZZovGXywz7QsDL12jXXubS7a3K", "Moderator", "Tilak Bhusal" }
+                    { 1, "khanalvaidurga71@gmail.com", 0, "$2a$11$rvRNkvhCu/NIncm/vyLWmOmbEPiC.RVUYQIp7I6lT8ApTFYycgLcS", "Admin", "Durga Khanal" },
+                    { 2, "sumildumre555@gmail.com", 0, "$2a$11$No09Dq2h44/BNomdkxNFdOU8ij9oF1cj9eYqTxDR8n0egS3Sq0GR2", "Moderator", "Sunil Dumre" },
+                    { 3, "bhushaltilak9@gmail.com", 0, "$2a$11$lPDoekBf5BkaYhyhlGOlFuCy3XC1rZ5Yn8Mk6WoobYbg6jJQFKBze", "Moderator", "Tilak Bhusal" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_bookingVaccinations_VaccinationId",
+                table: "bookingVaccinations",
+                column: "VaccinationId");
         }
 
         /// <inheritdoc />

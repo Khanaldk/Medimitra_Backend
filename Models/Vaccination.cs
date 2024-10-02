@@ -14,6 +14,7 @@ namespace MediMitra.Models
         public DateOnly ServeDate { get; set; }
         public VaccinationStatus Status { get; set; }
 
+        public ICollection<BookingVaccination> Bookings { get; set; } = new List<BookingVaccination>();
     }
     public enum VaccinationStatus
     {

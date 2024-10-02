@@ -61,6 +61,8 @@ namespace MediMitra.Migrations
 
                     b.HasKey("BookingId");
 
+                    b.HasIndex("VaccinationId");
+
                     b.ToTable("bookingVaccinations");
                 });
 
@@ -101,7 +103,7 @@ namespace MediMitra.Migrations
                             Id = 1,
                             Email = "khanalvaidurga71@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$FSzUlziklXrrzCKsUqYdA.SCzuUlWagk1yjU1uBR98putt94k5FyG",
+                            Password = "$2a$11$rvRNkvhCu/NIncm/vyLWmOmbEPiC.RVUYQIp7I6lT8ApTFYycgLcS",
                             Role = "Admin",
                             Username = "Durga Khanal"
                         },
@@ -110,7 +112,7 @@ namespace MediMitra.Migrations
                             Id = 2,
                             Email = "sumildumre555@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$SyGE50/xOdA7bAYEc0fVp.00LqedRH3orjDNFg.krdRXTcE46jBWu",
+                            Password = "$2a$11$No09Dq2h44/BNomdkxNFdOU8ij9oF1cj9eYqTxDR8n0egS3Sq0GR2",
                             Role = "Moderator",
                             Username = "Sunil Dumre"
                         },
@@ -119,7 +121,7 @@ namespace MediMitra.Migrations
                             Id = 3,
                             Email = "bhushaltilak9@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$/mYxoFxsf07oZGCYh7XKa.Hia7FZZovGXywz7QsDL12jXXubS7a3K",
+                            Password = "$2a$11$lPDoekBf5BkaYhyhlGOlFuCy3XC1rZ5Yn8Mk6WoobYbg6jJQFKBze",
                             Role = "Moderator",
                             Username = "Tilak Bhusal"
                         });
@@ -162,6 +164,22 @@ namespace MediMitra.Migrations
                     b.HasKey("VaccinationId");
 
                     b.ToTable("vaccinations");
+                });
+
+            modelBuilder.Entity("MediMitra.Models.BookingVaccination", b =>
+                {
+                    b.HasOne("MediMitra.Models.Vaccination", "Vaccination")
+                        .WithMany("Bookings")
+                        .HasForeignKey("VaccinationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vaccination");
+                });
+
+            modelBuilder.Entity("MediMitra.Models.Vaccination", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

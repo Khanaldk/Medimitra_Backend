@@ -6,7 +6,7 @@ namespace MediMitra.Services
 {
     public interface IVaccinationServices
     {
-        Task<Response<Vaccination>> addVaccination (AddvaccinationDTO addvaccinationDTO);
+        Task<Response<Vaccination>> addVaccination ([FromBody] AddvaccinationDTO addvaccinationDTO);
         Task<Response<List<Vaccination>>> getallVaccination();
         Task<Response<Vaccination>> getVaccinationById(int id);
         Task<Response<Vaccination>> getVaccinationByVaccinationName([FromQuery] String vaccinationName);

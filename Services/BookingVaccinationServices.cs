@@ -46,7 +46,7 @@ namespace MediMitra.Services
             var vaccinationBookpart = await _context.bookingVaccinations.Where(v => v.VaccinationId == booking.VaccinationId && v.UserId ==userId).FirstOrDefaultAsync();
             if (vaccinationBookpart != null)
             {
-                return new Response<BookingVaccination> { Status = false, Message = "Vaccination is aleady booked by you!" };
+                return new Response<BookingVaccination> { Status = false, Message = "Vaccination is already booked by you!",Type="VaccineAlreadyBooked" };
             }
 
             var bookVaccination = new BookingVaccination
@@ -75,7 +75,7 @@ namespace MediMitra.Services
                 message.Subject = "नयाँ खोप सूचना!";
                 message.Body = new TextPart("plain")
                 {
-                    Text = $"Dear {bookVaccination.PatientName},\r\n\r\nतपाईंको खोप बुकिङ सफलतापूर्वक पुष्टि भएको छ। बुकिङ विवरणहरू तल छन्:\r\n\r\n- नाम: {bookVaccination.PatientName}\r\n- जन्म मिति: {bookVaccination.DOB}\r\n - खोपको नाम: {vaccinationpart.VaccinationName}\r\n- खोपको प्रकार: {vaccinationpart.VaccinationType}\r\n- खोपको मात्रा: {vaccinationpart.VaccinationDose}\r\n- ठेगाना: {bookVaccination.Address}\r\n- बुकिङ मिति: {bookVaccination.BookingDate}\r\n- टोकन नम्बर: {bookVaccination.Token}\r\n\r\nकृपया सेवा लिन आउँदा यो टोकन साथमा ल्याउनुहोस्। धन्यवाद!\r\n\r\nशुभेच्छा,\r\nमेडिमित्र टिम"
+                    Text = $"Dear {bookVaccination.PatientName},\r\n\r\nतपाईंको खोप बुकिङ सफलतापूर्वक पुष्टि भएको छ। बुकिङ विवरणहरू तल छन्:\r\n\r\n- नाम: {bookVaccination.PatientName}\r\n- जन्म मिति: {bookVaccination.DOB}\r\n - खोपको नाम: {vaccinationpart.VaccinationName}\r\n- खोपको प्रकार: {vaccinationpart.VaccinationType}\r\n- खोपको मात्रा: {vaccinationpart.VaccinationDose}\r\n-खोपको ठेगाना: {vaccinationpart.Location}\r\n- बुकिङ मिति: {bookVaccination.BookingDate}\r\n- टोकन नम्बर: {bookVaccination.Token}\r\n\r\nकृपया सेवा लिन आउँदा यो टोकन साथमा ल्याउनुहोस्। धन्यवाद!\r\n\r\nशुभेच्छा,\r\nमेडिमित्र टिम"
                 };
 
                 using (var client = new SmtpClient())
@@ -99,39 +99,13 @@ namespace MediMitra.Services
 
        
 
-        public async Task<Response<BookingVaccination>> PeekNextBooking()
-        {
-            if (IsQueueEmpty())
-            {
-                return new Response<BookingVaccination> { Status = false, Message = $"Queue is Emplty,no booked available or unable to peek data from queue ie {_queueService.GetTotalQueueSize()}."};
-            }
-            var nextBookingId = _queueService.GetNextBooking();
-
-            if (nextBookingId == null || nextBookingId==0)
-            {
-                return new Response<BookingVaccination> { Status = false, Message = "NextBooking not available." };
-            }
-
-        
-            var booking = await _context.bookingVaccinations
-                .FirstOrDefaultAsync(b => b.BookingId == nextBookingId);
-
-            if (booking == null)
-            {
-                return new Response<BookingVaccination> { Status = false, Message = "No nextbooking found in database!" };
-            }
-
-            return new Response<BookingVaccination> { Status = true, Message = "Peeking next book sucessfully!",Data=booking };
-
-        }
+       
 
         public async Task<Response<BookingVaccination>> MarkDelayedNextBooking()
         {
             var nextBookingId = _queueService.GetNextBookingForDelayed();
-            Console.WriteLine(nextBookingId);
             if(nextBookingId == null || nextBookingId==0)
             {
-                Console.WriteLine("\nnextBookingId\n\n");
                 return new Response<BookingVaccination> { Status = false, Message = "No next booking found in queue" };
             }
             var booking =await _context.bookingVaccinations.FirstOrDefaultAsync(b => b.BookingId == nextBookingId);
@@ -147,10 +121,8 @@ namespace MediMitra.Services
         public async Task<Response<BookingVaccination>> MarkServedNextBooking()
         {
             var nextBookingId = _queueService.GetNextBookingForDelayed();
-            Console.WriteLine(nextBookingId);
             if (nextBookingId == null || nextBookingId == 0)
             {
-                Console.WriteLine("\nnextBookingId\n\n");
                 return new Response<BookingVaccination> { Status = false, Message = "No next booking found in queue" };
             }
             var booking = await _context.bookingVaccinations.FirstOrDefaultAsync(b => b.BookingId == nextBookingId);
@@ -163,27 +135,39 @@ namespace MediMitra.Services
             return new Response<BookingVaccination> { Status = true, Message = "User Served sucessfully!", Data = booking };
         }
 
-        //public async Task<Response<List<BookingVaccination>>> GetAllDelayedRetrieve()
+        //public async Task<Response<List<BookingVaccination>>> getallBookVaccination()
         //{
-        //    //var booking = await _context.bookingVaccinations.Where(b => b.Status==BookingStatus.Delayed).ToListAsync();
-        //    var booking = await _context.bookingVaccinations
-        //.Where(b => b.Status == BookingStatus.Delayed) 
-        //.OrderBy(b => b.Token) 
-        //.ToListAsync();
-
-        //    if (booking == null)
+        //    var vaccinationrecords = await _context.bookingVaccinations.Include(b=>b.Vaccination).ToListAsync();
+        //    if (vaccinationrecords == null || vaccinationrecords.Count == 0)
         //    {
-        //        return new Response<List<BookingVaccination>> { Status = false, Message = "No Delayed data found!" };
+        //        return new Response<List<BookingVaccination>> { Status = false, Message = "No BookVaccination Records found.", Type = "NoBookVaccination" };
         //    }
-        //    return new Response<List<BookingVaccination>> { Status = true, Message = " Delayed data retrieved successfully!",Data=booking };
+        //    return new Response<List<BookingVaccination>> { Status = true, Message = "vaccination Records retrieved successfully!.", Data = vaccinationrecords };
+
         //}
+
+        public async Task<Response<List<BookingVaccination>>> getallBookVaccinationOfUser(string userId)
+        {
+            var vaccinationrecords = await _context.bookingVaccinations
+       .Include(b => b.Vaccination) 
+       .Where(b => b.UserId == userId) 
+       .ToListAsync();
+            if (vaccinationrecords == null || vaccinationrecords.Count == 0)
+            {
+                return new Response<List<BookingVaccination>> { Status = false, Message = "No BookVaccination Records found.", Type = "NoBookVaccination" };
+            }
+            return new Response<List<BookingVaccination>> { Status = true, Message = "vaccination Records retrieved successfully!.", Data = vaccinationrecords };
+
+        }
 
         public async Task<Response<List<BookingVaccination>>>  GetDelayedBookingsSortedAsync()
         {
             var bookings = await _context.bookingVaccinations
-                .Where(b => b.Status == BookingStatus.Delayed)
-                .ToListAsync();
-            if(bookings.Count == 0 || bookings == null)
+     .Where(b => b.Status == BookingStatus.Delayed)
+     .Include(b => b.Vaccination) 
+     .ToListAsync();
+
+            if (bookings.Count == 0 || bookings == null)
             {
                 return new Response<List<BookingVaccination>> { Status = false, Message = " Delayed data not found!" };
             }
@@ -279,6 +263,82 @@ namespace MediMitra.Services
             }
             return new Response<BookingVaccination> { Status = false, Message = "Delayed data not found" };
         }
+
+
+
+
+        public async Task<Response<List<BookingVaccinationDTO>>> getallBookVaccination()
+        {
+            
+            var vaccinationRecords = await _context.bookingVaccinations
+                .Include(b => b.Vaccination) 
+                .ToListAsync();
+
+            if (vaccinationRecords == null || vaccinationRecords.Count == 0)
+            {
+                return new Response<List<BookingVaccinationDTO>>
+                {
+                    Status = false,
+                    Message = "No Booking Vaccination Records found.",
+                    Type = "NoBookVaccination"
+                };
+            }
+
+            
+            var bookingVaccinationDTOs = vaccinationRecords.Select(b => new BookingVaccinationDTO
+            {
+                BookingVaccinationId = b.BookingId,
+                PatientName = b.PatientName,
+                DOB = b.DOB,
+                BookingDate = b.BookingDate,
+                Address = b.Address,
+                Token=b.Token,
+                VaccinationId = b.VaccinationId,
+
+               
+                VaccinationName = b.Vaccination.VaccinationName,
+                VaccinationType = b.Vaccination.VaccinationType,
+                VaccinationDose = b.Vaccination.VaccinationDose,
+                Location = b.Vaccination.Location,
+                AgeGroup = b.Vaccination.AgeGroup,
+                ServeDate = b.Vaccination.ServeDate,
+                VaccinationStatus = (DTO.VaccinationStatus)b.Vaccination.Status,
+            }).ToList();
+
+            return new Response<List<BookingVaccinationDTO>>
+            {
+                Status = true,
+                Message = "Booking Vaccination Records retrieved successfully!",
+                Data = bookingVaccinationDTOs
+            };
+        }
+
+        public async Task<Response<BookingVaccination>> PeekNextBooking()
+        {
+            if (IsQueueEmpty())
+            {
+                return new Response<BookingVaccination> { Status = false, Message = $"Queue is Emplty,no booked available or unable to peek data from queue ie {_queueService.GetTotalQueueSize()}." };
+            }
+            var nextBookingId = _queueService.GetNextBooking();
+
+            if (nextBookingId == null || nextBookingId == 0)
+            {
+                return new Response<BookingVaccination> { Status = false, Message = "NextBooking not available." };
+            }
+
+
+            var booking = await _context.bookingVaccinations.Include(b => b.Vaccination)
+                .FirstOrDefaultAsync(b => b.BookingId == nextBookingId);
+
+            if (booking == null)
+            {
+                return new Response<BookingVaccination> { Status = false, Message = "No nextbooking found in database!" };
+            }
+
+            return new Response<BookingVaccination> { Status = true, Message = "Peeking next book sucessfully!", Data = booking };
+
+        }
+
     }
 
 }

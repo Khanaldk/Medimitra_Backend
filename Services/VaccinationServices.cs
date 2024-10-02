@@ -18,7 +18,7 @@ namespace MediMitra.Services
             _context = context;
             _configuration = configuration;
         }
-        public async Task<Response<Vaccination>> addVaccination(AddvaccinationDTO addvaccinationDTO)
+        public async Task<Response<Vaccination>> addVaccination([FromBody] AddvaccinationDTO addvaccinationDTO)
         {
             var vaccination = new Vaccination
             {

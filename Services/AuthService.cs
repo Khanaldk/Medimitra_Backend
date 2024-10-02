@@ -11,6 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Net.NetworkInformation;
 
 namespace MediMitra.Services
 {
@@ -59,31 +60,43 @@ namespace MediMitra.Services
             }
 
         }
-        public async Task<Response<string>> LoginUser(LoginDTO loginDTO)
+        public async Task<Response<LoginResponseDTO>> LoginUser(LoginDTO loginDTO)
         {
             var user = await _context.registerModels.FirstOrDefaultAsync(u => u.Email == loginDTO.Email);
-            if ( user!=null && (BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Password) && user.Email == loginDTO.Email))
+            if (user != null && (BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Password) && user.Email == loginDTO.Email))
             {
                 var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) // Adding User ID to claims
-                };
+        {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+        };
+
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
                 var token = new JwtSecurityToken(
-                       issuer: _configuration["Jwt:Issuer"],
-                       audience: _configuration["Jwt:Audience"],
-                       expires: DateTime.Now.AddHours(3),
-                       claims: authClaims,
-                       signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                       );
+                    issuer: _configuration["Jwt:Issuer"],
+                    audience: _configuration["Jwt:Audience"],
+                    expires: DateTime.Now.AddHours(3),
+                    claims: authClaims,
+                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+
                 var createdToken = new JwtSecurityTokenHandler().WriteToken(token);
-                return new Response<string> { Status = true, Message = "Login Successfully",Data=createdToken };
+
+                var response = new LoginResponseDTO
+                {
+                    UserName= user.Username,
+                    Token = createdToken,
+                    Role = user.Role
+                };
+
+                return new Response<LoginResponseDTO> { Status = true, Message = "Login Successfully", Data = response };
             }
-            return new Response<string> { Status = false, Message = "Email or password doesnot match.", Type = "EmailPassword" };
+
+            return new Response<LoginResponseDTO> { Status = false, Message = "Email or password does not match.", Type = "EmailPassword" };
         }
+
 
         public async Task<Response<string>> changePassword(ChangePasswordDTO changePasswordDTO, String Email)
         {
@@ -154,6 +167,30 @@ namespace MediMitra.Services
                 return new Response<string> { Status = true, Message = "Password reset Successfully!" };
             }
             return new Response<string> { Status = false, Message = "Invalid otp!",Type="Otp" };
+
+        }
+
+
+    public async Task<Response<ChangeRoleDTO>> ChangeRoleByAdmin([FromBody] ChangeRoleDTO changeRoleDTO)
+        {
+            var user = await _context.registerModels.FirstOrDefaultAsync(u => u.Email == changeRoleDTO.Email);
+
+            if (user == null)
+            {
+                return new Response<ChangeRoleDTO> { Status = false, Message = "User not found",Type="InvalidEmail" };
+            }
+            
+            var validRoles = new List<string> { "Admin", "Moderator", "User" }; 
+            if (!validRoles.Contains(changeRoleDTO.NewRole))
+            {
+                return new Response<ChangeRoleDTO> { Status = false, Message = "Role doesnot exist.", Type="InvalidRoleAssign" };
+            }
+            
+            user.Role = changeRoleDTO.NewRole;
+            _context.registerModels.Update(user);
+            await _context.SaveChangesAsync();
+
+            return new Response<ChangeRoleDTO> { Status = true, Message = "User Role updated successfully",Data=changeRoleDTO };
 
         }
     }

@@ -17,6 +17,12 @@ namespace MediMitra.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<BookingVaccination>()
+                .HasOne(b => b.Vaccination)
+                .WithMany(v => v.Bookings)
+                .HasForeignKey(b => b.VaccinationId);
+
             modelBuilder.Entity<BookingVaccination>()
         .Property(b => b.Status)
         .HasConversion<string>();

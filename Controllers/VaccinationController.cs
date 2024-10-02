@@ -21,7 +21,7 @@ namespace MediMitra.Controllers
         [Authorize(Roles ="Admin,Moderator")]
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> VaccinationCreate(AddvaccinationDTO addvaccinationDTO)
+        public async Task<IActionResult> VaccinationCreate([FromBody] AddvaccinationDTO addvaccinationDTO)
         {
             if(ModelState.IsValid)
             {

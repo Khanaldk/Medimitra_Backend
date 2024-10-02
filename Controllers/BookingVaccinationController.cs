@@ -22,7 +22,7 @@ namespace MediMitra.Controllers
             _bookingVaccinationServices = bookingVaccinationServices;
         }
 
-      
+        [Authorize(Roles ="User")]
         [HttpPost]
         [Route("add")]
         public async Task<IActionResult> CreateBooking(AddBookingVaccinationDTO booking)
@@ -106,6 +106,32 @@ namespace MediMitra.Controllers
         public async Task<IActionResult> ChangeDelayedStatusToServed(int id)
         {
             var result=await _bookingVaccinationServices.UpdateDelayedStatusToServed(id);
+            if (result.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, result);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+
+        [Authorize(Roles = "Admin,Moderator")]
+        [HttpGet("getAllBookVaccination")]
+        public async Task<IActionResult> GetAllBookVaccination()
+        {
+            var result = await _bookingVaccinationServices.getallBookVaccination();
+            if (result.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, result);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [Authorize(Roles ="User")]
+        [HttpGet("getBookVaccinationOfCurrentUser")]
+        public async Task<IActionResult> GetAllBookVaccinationOfCurrentUser()
+        {
+            String userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _bookingVaccinationServices.getallBookVaccinationOfUser(userId);
             if (result.Status)
             {
                 return StatusCode(StatusCodes.Status200OK, result);
