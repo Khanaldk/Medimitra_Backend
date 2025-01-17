@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 
 namespace MediMitra.Controllers
@@ -22,7 +23,7 @@ namespace MediMitra.Controllers
             _bookingVaccinationServices = bookingVaccinationServices;
         }
 
-        [Authorize(Roles ="User")]
+        [Authorize(Roles = "User")]
         [HttpPost]
         [Route("add")]
         public async Task<IActionResult> CreateBooking(AddBookingVaccinationDTO booking)
@@ -31,7 +32,7 @@ namespace MediMitra.Controllers
             {
                 return BadRequest("Invalid booking data.");
             }
-           if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 String userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 String Email = User.FindFirstValue(ClaimTypes.Email);
@@ -45,12 +46,12 @@ namespace MediMitra.Controllers
             return BadRequest(ModelState);
         }
 
-        [Authorize(Roles = "Admin,Moderator")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("peeknextBooking")]
         public async Task<IActionResult> PeekNextBookingvaccination()
         {
             // Retrieve the next booking ID from the queue
-            var nextBookingId =await _bookingVaccinationServices.PeekNextBooking();
+            var nextBookingId = await _bookingVaccinationServices.PeekNextBooking();
             if (nextBookingId.Status)
             {
                 return StatusCode(StatusCodes.Status200OK, nextBookingId);
@@ -59,7 +60,7 @@ namespace MediMitra.Controllers
 
         }
 
-        [Authorize(Roles = "Admin,Moderator")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("markedStatusAsDelayed")]
         public async Task<IActionResult> DelayedBookingvaccination()
         {
@@ -73,7 +74,7 @@ namespace MediMitra.Controllers
 
         }
 
-        [Authorize(Roles = "Admin,Moderator")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("markedStatusAsServed")]
         public async Task<IActionResult> ServedBookingvaccination()
         {
@@ -87,13 +88,13 @@ namespace MediMitra.Controllers
 
         }
 
-        [Authorize(Roles = "Admin,Moderator")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("retrieveVaccinationBookDelayed")]
         public async Task<IActionResult> GetDelayedBookingvaccination()
         {
             // Retrieve the next booking ID from the queue
             var nextBookingId = await _bookingVaccinationServices.GetDelayedBookingsSortedAsync();
-            if (nextBookingId!=null)
+            if (nextBookingId != null)
             {
                 return StatusCode(StatusCodes.Status200OK, nextBookingId);
             }
@@ -101,11 +102,11 @@ namespace MediMitra.Controllers
 
         }
 
-        [Authorize(Roles = "Admin,Moderator")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("DelayedToServe/{id}")]
         public async Task<IActionResult> ChangeDelayedStatusToServed(int id)
         {
-            var result=await _bookingVaccinationServices.UpdateDelayedStatusToServed(id);
+            var result = await _bookingVaccinationServices.UpdateDelayedStatusToServed(id);
             if (result.Status)
             {
                 return StatusCode(StatusCodes.Status200OK, result);
@@ -114,7 +115,7 @@ namespace MediMitra.Controllers
         }
 
 
-        [Authorize(Roles = "Admin,Moderator")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("getAllBookVaccination")]
         public async Task<IActionResult> GetAllBookVaccination()
         {
@@ -126,12 +127,65 @@ namespace MediMitra.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [Authorize(Roles ="User")]
+        [Authorize(Roles = "User")]
         [HttpGet("getBookVaccinationOfCurrentUser")]
         public async Task<IActionResult> GetAllBookVaccinationOfCurrentUser()
         {
-            String userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await _bookingVaccinationServices.getallBookVaccinationOfUser(userId);
+            if (result.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, result);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet("getBookVaccinationOfServedCurrentUser")]
+        public async Task<IActionResult> GetAllBookVaccinationOfServedCurrentUser()
+        {
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _bookingVaccinationServices.getallBookVaccinationOfServeUser(userId);
+            if (result.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, result);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+
+        [Authorize(Roles = "User")]
+        [HttpPut("updateBookVaccination/{id}")]
+        public async Task<IActionResult> UpdateDetailsOfBookVaccination(int id, UpdateBookVaccinationDTO updateBookVaccinationDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _bookingVaccinationServices.UpdateBookVaccination(id, updateBookVaccinationDTO);
+                if (result.Status)
+                {
+                    return StatusCode(StatusCodes.Status200OK, result);
+                }
+                return StatusCode(StatusCodes.Status400BadRequest, result);
+            }
+            return BadRequest(ModelState);
+        }
+
+
+        [HttpGet("getBookVaccination/{id}")]
+        public async Task<IActionResult> GetDetailsOfBookVaccinationById(int id)
+        {
+            var result = await _bookingVaccinationServices.GetBookVaccinationById(id);
+            if (result.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, result);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+        [HttpGet("getBookedVaccinationName/{vaccinationName}")]
+        public async Task<IActionResult> GetBookedVaccinationInBookVaccination(string vaccinationName)
+        {
+            var result = await _bookingVaccinationServices.GetByBookVaccinationByVaccinationName(vaccinationName);
             if (result.Status)
             {
                 return StatusCode(StatusCodes.Status200OK, result);
@@ -140,4 +194,7 @@ namespace MediMitra.Controllers
         }
     }
 }
+
+    
+
 

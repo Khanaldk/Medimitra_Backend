@@ -12,5 +12,7 @@ namespace MediMitra.Services
         Task<Response<int>> forgotPassword(string email, HttpContext httpcontext);
         Task<Response<string>> ResetPassword(int otp, string newPassword, string confirmPassword, HttpContext httpContext);
         Task<Response<ChangeRoleDTO>> ChangeRoleByAdmin([FromBody] ChangeRoleDTO changeRoleDTO);
+        Task<Response<List<RegisterModel>>> GetAllUser();
+        Task<Response<List<BookingVaccination>>> GetallBookVaccinationOfUser(string userId);
     }
-}
+    }

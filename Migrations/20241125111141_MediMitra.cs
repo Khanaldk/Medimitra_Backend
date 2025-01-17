@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace MediMitra.Migrations
 {
     /// <inheritdoc />
-    public partial class Medimitra : Migration
+    public partial class MediMitra : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -78,12 +76,7 @@ namespace MediMitra.Migrations
             migrationBuilder.InsertData(
                 table: "registerModels",
                 columns: new[] { "Id", "Email", "Otp", "Password", "Role", "Username" },
-                values: new object[,]
-                {
-                    { 1, "khanalvaidurga71@gmail.com", 0, "$2a$11$rvRNkvhCu/NIncm/vyLWmOmbEPiC.RVUYQIp7I6lT8ApTFYycgLcS", "Admin", "Durga Khanal" },
-                    { 2, "sumildumre555@gmail.com", 0, "$2a$11$No09Dq2h44/BNomdkxNFdOU8ij9oF1cj9eYqTxDR8n0egS3Sq0GR2", "Moderator", "Sunil Dumre" },
-                    { 3, "bhushaltilak9@gmail.com", 0, "$2a$11$lPDoekBf5BkaYhyhlGOlFuCy3XC1rZ5Yn8Mk6WoobYbg6jJQFKBze", "Moderator", "Tilak Bhusal" }
-                });
+                values: new object[] { 1, "khanalvaidurga71@gmail.com", 0, "$2a$11$wj4gEdTno3K8lhgw3HRXteI74/fqYadHd/hNUY3B64pv1gzxdTgbO", "Admin", "Durga Khanal" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_bookingVaccinations_VaccinationId",

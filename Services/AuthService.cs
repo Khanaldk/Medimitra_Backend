@@ -12,6 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Net.NetworkInformation;
+using System.Reflection.Metadata;
 
 namespace MediMitra.Services
 {
@@ -62,22 +63,24 @@ namespace MediMitra.Services
         }
         public async Task<Response<LoginResponseDTO>> LoginUser(LoginDTO loginDTO)
         {
+
+
             var user = await _context.registerModels.FirstOrDefaultAsync(u => u.Email == loginDTO.Email);
             if (user != null && (BCrypt.Net.BCrypt.Verify(loginDTO.Password, user.Password) && user.Email == loginDTO.Email))
             {
                 var authClaims = new List<Claim>
-        {
+                 {
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Role, user.Role),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-        };
+                     };
 
                 var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
                 var token = new JwtSecurityToken(
                     issuer: _configuration["Jwt:Issuer"],
                     audience: _configuration["Jwt:Audience"],
-                    expires: DateTime.Now.AddHours(3),
+                    expires: DateTime.UtcNow.AddHours(1),
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
@@ -88,7 +91,8 @@ namespace MediMitra.Services
                 {
                     UserName= user.Username,
                     Token = createdToken,
-                    Role = user.Role
+                    Role = user.Role,
+                    UserId = user.Id,
                 };
 
                 return new Response<LoginResponseDTO> { Status = true, Message = "Login Successfully", Data = response };
@@ -180,7 +184,7 @@ namespace MediMitra.Services
                 return new Response<ChangeRoleDTO> { Status = false, Message = "User not found",Type="InvalidEmail" };
             }
             
-            var validRoles = new List<string> { "Admin", "Moderator", "User" }; 
+            var validRoles = new List<string> { "Admin","User" }; 
             if (!validRoles.Contains(changeRoleDTO.NewRole))
             {
                 return new Response<ChangeRoleDTO> { Status = false, Message = "Role doesnot exist.", Type="InvalidRoleAssign" };
@@ -193,6 +197,33 @@ namespace MediMitra.Services
             return new Response<ChangeRoleDTO> { Status = true, Message = "User Role updated successfully",Data=changeRoleDTO };
 
         }
+
+        public async Task<Response<List<RegisterModel>>> GetAllUser()
+        {
+            var user = await _context.registerModels.ToListAsync();
+            if (user != null)
+            {
+                return new Response<List<RegisterModel>> { Status = true, Message = "All User Retrieved Successfully", Data = user };
+            }
+            return new Response<List<RegisterModel>> { Status = false, Message = "No User Found" ,Type="USERNOTFOUND"};
+
+        }
+
+        public async Task<Response<List<BookingVaccination>>> GetallBookVaccinationOfUser(string userId)
+        {
+            var vaccinationrecords = await _context.bookingVaccinations
+       .Include(b => b.Vaccination)
+       .Where(b => b.UserId == userId)
+       .ToListAsync();
+            if (vaccinationrecords == null || vaccinationrecords.Count == 0)
+            {
+                return new Response<List<BookingVaccination>> { Status = false, Message = "No BookVaccination Records found.", Type = "NoBookVaccination" };
+            }
+            return new Response<List<BookingVaccination>> { Status = true, Message = "vaccination Records retrieved successfully!.", Data = vaccinationrecords };
+
+        }
+
+
     }
 
 }

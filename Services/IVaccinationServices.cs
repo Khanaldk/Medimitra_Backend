@@ -14,5 +14,9 @@ namespace MediMitra.Services
         Task<Response<Vaccination>> getVaccinationNameAndType(String vaccinationName,String vaccinationType);
         Task<Response<Vaccination>> updateVaccination(int id,UpdateVaccinationDTO updateVaccinationDTO);
         Task<Response<Vaccination>>deleteVaccination(int id);
+        Task<Response<Vaccination>> SendNotificationOfVaccination(int id);
+
+
+        
     }
 }

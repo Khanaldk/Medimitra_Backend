@@ -17,10 +17,6 @@ namespace MediMitra.Models
         public BookingStatus Status { get; set; }
         public Vaccination Vaccination { get; set; }
 
-        internal object Select(Func<object, BookingVaccinationDTO> value)
-        {
-            throw new NotImplementedException();
-        }
     }
     public enum BookingStatus
     {

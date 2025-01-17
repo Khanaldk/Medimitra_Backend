@@ -35,8 +35,8 @@ namespace MediMitra.DTO
     }
     public enum VaccinationStatus
     {
-        Available,
-        NotAvailable
+        Running,
+        Completed
     }
 }
 

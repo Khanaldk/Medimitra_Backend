@@ -12,8 +12,10 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
+builder.Services.AddSignalR();
+
+//builder.Services.AddHostedService<BookingReminderService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
@@ -26,12 +28,11 @@ builder.Services.AddCors(options =>
 });
 });
 
-
-builder.Services.AddDistributedMemoryCache(); // Registers the in-memory cache
+builder.Services.AddDistributedMemoryCache(); 
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(1); // Set session timeout
+    options.IdleTimeout = TimeSpan.FromHours(1); 
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.SameSite = SameSiteMode.None;
@@ -51,7 +52,6 @@ builder.Services.AddSingleton<BookingQueueService>();
 builder.Services.AddScoped<BookingVaccinationServices>();
 
 
-// Adding Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -133,7 +133,6 @@ builder.Services.AddAuthentication(options =>
 
 
 builder.Services.AddAuthorization();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
@@ -145,7 +144,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API documentation with JWT authentication"
     });
 
-    // Add JWT Authentication in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -176,7 +174,6 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-//Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),sqlOptions => {
     sqlOptions.CommandTimeout(60);
@@ -187,7 +184,6 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -195,17 +191,19 @@ if (app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 
-app.UseCors("AllowReactApp");
+app.UseCors("AllowReactApp");  
+
+app.UseHttpsRedirection();     
+
+app.UseAuthentication();      
+
+app.UseAuthorization();        
+
+app.MapHub<ChatHub>("/chatHub");
 
 
-app.UseHttpsRedirection();
+app.UseSession();             
 
-app.UseAuthentication();
+app.MapControllers();       
 
-app.UseAuthorization();
-app.UseSession();
-
-
-app.MapControllers();
-
-app.Run();
+app.Run();                   

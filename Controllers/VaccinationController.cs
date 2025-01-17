@@ -18,7 +18,7 @@ namespace MediMitra.Controllers
                 _vaccinationServices = vaccinationServices;
         }
 
-        [Authorize(Roles ="Admin,Moderator")]
+        [Authorize(Roles ="Admin")]
         [HttpPost]
         [Route("add")]
         public async Task<IActionResult> VaccinationCreate([FromBody] AddvaccinationDTO addvaccinationDTO)
@@ -97,7 +97,7 @@ namespace MediMitra.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
 
-        [Authorize(Roles = "Admin,Moderator")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("updateVaccination/{id}")]
         
         public async Task<IActionResult> UpdateVaccinationData(int id,UpdateVaccinationDTO updateVaccinationDTO)
@@ -116,7 +116,7 @@ namespace MediMitra.Controllers
 
          }
 
-        [Authorize(Roles = "Admin,Moderator")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("deleteVaccination/{id}")]
         public async Task<IActionResult> DeleteVaccinationDetails(int id)
         {
@@ -128,6 +128,19 @@ namespace MediMitra.Controllers
             return StatusCode(StatusCodes.Status400BadRequest, result);
 
         }
-    
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("sendNotification/{id}")]
+        public async Task<IActionResult> SendNotification(int id)
+        {
+            var result = await _vaccinationServices.SendNotificationOfVaccination(id);
+            if (result.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, result);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+
+        }
+
     }
 }

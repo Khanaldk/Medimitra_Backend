@@ -18,6 +18,11 @@ namespace MediMitra.DTO
         [Range(1, 10, ErrorMessage = "Vaccination Dose must be between 1 and 10.")]
         public int VaccinationDose { get; set; }
 
+        [Required(ErrorMessage = "Location is required.")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Location must be more than 3 and less than 50 characters.")]
+        public String Location { get; set; } = string.Empty;
+
+
         [Required(ErrorMessage = "Age Group is required.")]
         [AgeGroupFormat(ErrorMessage = "Age Group must be in the format '0-2 years', '3-5 years', etc.")]
         public string AgeGroup { get; set; } = string.Empty;
@@ -26,6 +31,7 @@ namespace MediMitra.DTO
 
         [DataType(DataType.Date)]
         public DateOnly ServeDate { get; set; }
-      
+        public VaccinationStatus Status { get; set; }
+
     }
 }

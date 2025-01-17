@@ -66,6 +66,34 @@ namespace MediMitra.Migrations
                     b.ToTable("bookingVaccinations");
                 });
 
+            modelBuilder.Entity("MediMitra.Models.Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("chatMessages");
+                });
+
             modelBuilder.Entity("MediMitra.Models.RegisterModel", b =>
                 {
                     b.Property<int>("Id")
@@ -103,27 +131,9 @@ namespace MediMitra.Migrations
                             Id = 1,
                             Email = "khanalvaidurga71@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$rvRNkvhCu/NIncm/vyLWmOmbEPiC.RVUYQIp7I6lT8ApTFYycgLcS",
+                            Password = "$2a$11$5Gc2HUVX.U7XPXKJHiQA8eDIh0wxzY4v08uZZ66sFLdkNGnQdQ7sW",
                             Role = "Admin",
                             Username = "Durga Khanal"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "sumildumre555@gmail.com",
-                            Otp = 0,
-                            Password = "$2a$11$No09Dq2h44/BNomdkxNFdOU8ij9oF1cj9eYqTxDR8n0egS3Sq0GR2",
-                            Role = "Moderator",
-                            Username = "Sunil Dumre"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "bhushaltilak9@gmail.com",
-                            Otp = 0,
-                            Password = "$2a$11$lPDoekBf5BkaYhyhlGOlFuCy3XC1rZ5Yn8Mk6WoobYbg6jJQFKBze",
-                            Role = "Moderator",
-                            Username = "Tilak Bhusal"
                         });
                 });
 

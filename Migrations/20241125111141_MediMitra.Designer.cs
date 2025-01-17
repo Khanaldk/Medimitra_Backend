@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MediMitra.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241001004710_Medimitra")]
-    partial class Medimitra
+    [Migration("20241125111141_MediMitra")]
+    partial class MediMitra
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -106,27 +106,9 @@ namespace MediMitra.Migrations
                             Id = 1,
                             Email = "khanalvaidurga71@gmail.com",
                             Otp = 0,
-                            Password = "$2a$11$rvRNkvhCu/NIncm/vyLWmOmbEPiC.RVUYQIp7I6lT8ApTFYycgLcS",
+                            Password = "$2a$11$wj4gEdTno3K8lhgw3HRXteI74/fqYadHd/hNUY3B64pv1gzxdTgbO",
                             Role = "Admin",
                             Username = "Durga Khanal"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "sumildumre555@gmail.com",
-                            Otp = 0,
-                            Password = "$2a$11$No09Dq2h44/BNomdkxNFdOU8ij9oF1cj9eYqTxDR8n0egS3Sq0GR2",
-                            Role = "Moderator",
-                            Username = "Sunil Dumre"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "bhushaltilak9@gmail.com",
-                            Otp = 0,
-                            Password = "$2a$11$lPDoekBf5BkaYhyhlGOlFuCy3XC1rZ5Yn8Mk6WoobYbg6jJQFKBze",
-                            Role = "Moderator",
-                            Username = "Tilak Bhusal"
                         });
                 });
 

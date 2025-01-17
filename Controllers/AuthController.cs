@@ -113,6 +113,21 @@ namespace MediMitra.Controllers
             }
             return StatusCode(StatusCodes.Status400BadRequest, result);
         }
+
+        [Authorize]
+        [HttpGet("getalluser")]
+        public async Task<IActionResult> RetrievedAllUser()
+        {
+
+            var result = await _authService.GetAllUser();
+            if (result.Status)
+            {
+                return StatusCode(StatusCodes.Status200OK, result);
+            }
+            return StatusCode(StatusCodes.Status400BadRequest, result);
+        }
+
+       
     }
 
 }

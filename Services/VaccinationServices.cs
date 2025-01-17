@@ -33,52 +33,52 @@ namespace MediMitra.Services
 
             if(vaccination!=null)
             {
-                var user = await _context.registerModels.ToListAsync();
-                if(user!=null)
-                {
-                   
-                    for (int i = 0;i<user.Count;i++)
-                    {
-                        try
-                        {
-                            var message = new MimeMessage();
-                            message.From.Add(new MailboxAddress("Durga Khanal", _configuration["SmtpSettings:Username"]));
-                            message.To.Add(new MailboxAddress("", user[i].Email));
-                            message.Subject = "नयाँ खोप सूचना!";
-                            message.Body = new TextPart("plain")
-                            {
-                                Text = $@"
-                                नयाँ खोप निम्न विवरणहरू सहित सिर्जना गरिएको छ:
+                //var user = await _context.registerModels.ToListAsync();
+                //if (user != null)
+                //{
 
-                                - खोपको नाम: {vaccination.VaccinationName}
-                                - खोपको प्रकार: {vaccination.VaccinationType}
-                                - स्थान:{vaccination.Location}
-                                - खोपको मात्रा: {vaccination.VaccinationDose}
-                                - उमेर समूह: {vaccination.AgeGroup}
-                                - Service मिति: {vaccination.ServeDate:yyyy-MM-dd}
+                //    for (int i = 0; i < user.Count; i++)
+                //    {
+                //        try
+                //        {
+                //            var message = new MimeMessage();
+                //            message.From.Add(new MailboxAddress("Durga Khanal", _configuration["SmtpSettings:Username"]));
+                //            message.To.Add(new MailboxAddress("", user[i].Email));
+                //            message.Subject = "नयाँ खोप सूचना!";
+                //            message.Body = new TextPart("plain")
+                //            {
+                //                Text = $@"
+                //                नयाँ खोप निम्न विवरणहरू सहित सिर्जना गरिएको छ:
 
-                                कृपया विवरणहरू समीक्षा गर्नुहोस् र आवश्यक कार्यहरू गर्नुहोस्।
-                                "
-                                                            };
+                //                - खोपको नाम: {vaccination.VaccinationName}
+                //                - खोपको प्रकार: {vaccination.VaccinationType}
+                //                - स्थान:{vaccination.Location}
+                //                - खोपको मात्रा: {vaccination.VaccinationDose}
+                //                - उमेर समूह: {vaccination.AgeGroup}
+                //                - Service मिति: {vaccination.ServeDate:yyyy-MM-dd}
 
-                            using (var client = new SmtpClient())
-                            {
-                                await client.ConnectAsync(_configuration["SmtpSettings:Server"], int.Parse(_configuration["SmtpSettings:Port"]), MailKit.Security.SecureSocketOptions.StartTls);
-                                await client.AuthenticateAsync(_configuration["SmtpSettings:Username"], _configuration["SmtpSettings:Password"]);
-                                await client.SendAsync(message);
-                                await _context.SaveChangesAsync();
-                                await client.DisconnectAsync(true);
-                               
+                //                कृपया विवरणहरू समीक्षा गर्नुहोस् र आवश्यक कार्यहरू गर्नुहोस्।
+                //                "
+                //            };
 
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            return new Response<Vaccination> { Status = false, Message = ex.Message };
-                        }
+                //            using (var client = new SmtpClient())
+                //            {
+                //                await client.ConnectAsync(_configuration["SmtpSettings:Server"], int.Parse(_configuration["SmtpSettings:Port"]), MailKit.Security.SecureSocketOptions.StartTls);
+                //                await client.AuthenticateAsync(_configuration["SmtpSettings:Username"], _configuration["SmtpSettings:Password"]);
+                //                await client.SendAsync(message);
+                //                await _context.SaveChangesAsync();
+                //                await client.DisconnectAsync(true);
 
-                    }
-                }
+
+                //            }
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            return new Response<Vaccination> { Status = false, Message = ex.Message };
+                //        }
+
+                //    }
+                //}
 
                 await _context.vaccinations.AddAsync(vaccination);
                 await _context.SaveChangesAsync();
@@ -152,7 +152,9 @@ namespace MediMitra.Services
             vaccination.VaccinationType = updateVaccinationDTO.VaccinationType;
             vaccination.VaccinationDose = updateVaccinationDTO.VaccinationDose;
             vaccination.AgeGroup= updateVaccinationDTO.AgeGroup;
+            vaccination.Location= updateVaccinationDTO.Location;
             vaccination.ServeDate= updateVaccinationDTO.ServeDate;
+            vaccination.Status = (Models.VaccinationStatus)updateVaccinationDTO.Status;
           
             var user = await _context.registerModels.ToListAsync();
             if (user != null)
@@ -176,6 +178,8 @@ namespace MediMitra.Services
                                 - खोपको मात्रा: {vaccination.VaccinationDose}
                                 - उमेर समूह: {vaccination.AgeGroup}
                                 - Service मिति: {vaccination.ServeDate:yyyy-MM-dd}
+                                - Status :{vaccination.Status = (Models.VaccinationStatus)updateVaccinationDTO.Status}
+
 
                                 कृपया विवरणहरू समीक्षा गर्नुहोस् र आवश्यक कार्यहरू गर्नुहोस्।
                                 "
@@ -216,6 +220,65 @@ namespace MediMitra.Services
             _context.vaccinations.Remove(vaccination);
             await _context.SaveChangesAsync();
             return new Response<Vaccination> { Status = true, Message = "Vaccination deleted Successfully!!" };
+        }
+
+        public async Task<Response<Vaccination>> SendNotificationOfVaccination(int id)
+        {
+            var vaccination = await _context.vaccinations.FindAsync(id);
+            if(vaccination == null)
+            {
+                return new Response<Vaccination> { Status = false, Message = "Vaccination not found" };
+            }
+
+
+            var user = await _context.registerModels.ToListAsync();
+            if (user != null)
+            {
+
+                for (int i = 0; i < user.Count; i++)
+                {
+                    try
+                    {
+                        var message = new MimeMessage();
+                        message.From.Add(new MailboxAddress("Durga Khanal", _configuration["SmtpSettings:Username"]));
+                        message.To.Add(new MailboxAddress("", user[i].Email));
+                        message.Subject = "नयाँ खोप सूचना!";
+                        message.Body = new TextPart("plain")
+                        {
+                            Text = $@"
+                            नयाँ खोप निम्न विवरणहरू सहित सिर्जना गरिएको छ:
+
+                            - खोपको नाम: {vaccination.VaccinationName}
+                            - खोपको प्रकार: {vaccination.VaccinationType}
+                            - स्थान:{vaccination.Location}
+                            - खोपको मात्रा: {vaccination.VaccinationDose}
+                            - उमेर समूह: {vaccination.AgeGroup}
+                            - Service मिति: {vaccination.ServeDate:yyyy-MM-dd}
+
+                            कृपया विवरणहरू समीक्षा गर्नुहोस् र आवश्यक कार्यहरू गर्नुहोस्।
+                            "
+                        };
+
+                        using (var client = new SmtpClient())
+                        {
+                            await client.ConnectAsync(_configuration["SmtpSettings:Server"], int.Parse(_configuration["SmtpSettings:Port"]), MailKit.Security.SecureSocketOptions.StartTls);
+                            await client.AuthenticateAsync(_configuration["SmtpSettings:Username"], _configuration["SmtpSettings:Password"]);
+                            await client.SendAsync(message);
+                            await _context.SaveChangesAsync();
+                            await client.DisconnectAsync(true);
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        return new Response<Vaccination> { Status = false, Message = ex.Message };
+                    }
+
+                }
+                return new Response<Vaccination> { Status = true, Message = "Notification sent Successfully." };
+            }
+            return new Response<Vaccination> { Status = false, Message = "User not found to send notification" };
+
         }
     }
 }
